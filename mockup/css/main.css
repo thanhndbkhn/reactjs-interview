@@ -79,6 +79,10 @@ table {
 }
 
 .btn-blue {
+  background-color: #2196F3;
+}
+
+.btn-iris-blue {
   background-color: #00BCD4;
 }
 
@@ -94,12 +98,25 @@ table {
   width: 100%;
 }
 
+.w-100px {
+  width: 100px;
+}
+
+.w-120px {
+  width: 120px;
+}
+
+.h-35 {
+  height: 35px;
+}
+
 .wrap-container {
+  position: relative;
   margin: 0 auto;
   width: 40%;
   height: 100%;
   border: 1px solid;
-  min-width: 320px;
+  min-width: 430px;
 }
 
 .wrap-container label {
@@ -155,23 +172,33 @@ table {
   font-size: 13px;
 }
 
-.w-100px {
-  width: 100px;
-}
-
 .wrap-container .list-task .content-add-edit-task {
   padding: 10px 0;
-  border-right: 1px solid;
-  border-left: 1px solid;
+  border: 1px solid;
+  border-top: 0;
 }
 
-.list-task .item .item-action{
+.list-task .item:not(:last-child) {
+  margin-bottom: 10px;
+}
+
+.list-task .item .item-action,
+.wrap-container .bull-action{
   display: flex;
   justify-content: space-between;
   align-items: center;
   height: 70px;
   border: 1px solid;
   padding: 0 10px;
+}
+
+.wrap-container .bull-action {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  border: 0;
+  border-top: 1px solid;
 }
 
 /* Create a custom checkbox */
