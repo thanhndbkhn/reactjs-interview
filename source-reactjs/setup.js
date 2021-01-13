@@ -65,7 +65,7 @@ createFolder(`${projectRoot}/public`);
   'webpack.config.js',
   'webpack.prod.js',
   'src/index.tsx',
-  'src/components/App.tsx',
+  'src/components/manager-task.tsx',
   'public/index.html',
 ].forEach(f => {
   copy(`${setupRoot}/${f}`, `${projectRoot}/${f}`);

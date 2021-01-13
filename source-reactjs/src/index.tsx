@@ -1,9 +1,9 @@
 import ReactDOM from 'react-dom';
 import React from 'react';
+// import '../assets/css/main.css';
+import ManagerTask from './components/manager-task';
 
-import App from './components/App';
-
-ReactDOM.render(<App name="World" />, document.querySelector('#container'));
+ReactDOM.render(<ManagerTask/>, document.querySelector('#container'));
 
 if (module && module.hot) {
   module.hot.accept();
