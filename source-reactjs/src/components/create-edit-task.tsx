@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ACTION_TASK_TYPE, OPTION_PIORITY, TaskType } from '../const/constants';
 import moment from 'moment';
 import Select from 'react-select';
@@ -29,11 +29,14 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
     }
   }, [])
 
+  /**
+   *  Action to task (update, remove, remove tasks check)
+   */
   const actionTaskClick = () => {
     if(props.actionTask) {
       props.actionTask(
         {
-          taskId: uuidV4(),
+          taskId: props.task ? props.task.taskId : uuidV4(),
           taskName,
           descriptionTask,
           dateTime,
@@ -43,6 +46,10 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
     }
   }
 
+  /**
+   * change select piority task
+   * @param selectedOption 
+   */
   const changeSelectPiority = (selectedOption: any) => {
     setPiorityTask(selectedOption);
   }

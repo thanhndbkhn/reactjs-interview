@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ACTION_TASK_TYPE, TaskType } from '../const/constants';
 import useDebounce from '../helpers/useDebounce';
 import CreateEditTask from './create-edit-task';
@@ -6,19 +6,47 @@ import TaskItem from './task-item';
 import _ from 'lodash';
 import moment from 'moment';
 import { compareDate } from '../helpers/logic';
+// import 'react-notifications/lib/notifications.css';
+
 
 export default function ManagerTask() {
+  /**
+   * Get Data list default in local storage
+   */
+  const getDataInLocalStorage = () => {
+    const listTaskLocalStorage = localStorage.getItem('listTask');
+    if (!_.isNil(listTaskLocalStorage)) {
+      return JSON.parse(listTaskLocalStorage);
+    }
+    return Array<TaskType>();
+  }
 
-  const [listTask, setListTask] = useState<TaskType[]>([]);
+  const [listTask, setListTask] = useState(() => {
+    const data = getDataInLocalStorage();
+    return data;
+  });
+
   const [listTaskDisplay, setListTaskDisplay] = useState<TaskType[]>([]);
+  const [listTaskSelectUpdate, setListTaskSelectUpdate] = useState<TaskType[]>([]);
   const [textSearch, setTextSearch] = useState('');
   const [checkEditTask, setCheckEditTask] = useState(false);
   const debouncedTextSearch = useDebounce(textSearch, 500);
-  const refInput = useRef(null);
-  // const refInput = useRef(null);
 
-  const findListByName = (text: string) => {
-    return listTask.filter(elm => elm.taskName.includes(text));
+  /**
+   * Update data into localstorage
+   * @param listTask 
+   */
+  const updateDataListTask = (listTask: TaskType[]) => {
+    setListTask(listTask);
+    localStorage.setItem('listTask', JSON.stringify(listTask));
+  }
+
+  /**
+   * Find list task have taskName includes textSearch input
+   * @param text 
+   */
+  const findListByName = (taskName: string) => {
+    return listTask.filter((elm: { taskName: string | string[]; }) => elm.taskName.includes(taskName));
   }
 
   useEffect(() => {
@@ -30,40 +58,113 @@ export default function ManagerTask() {
     }
   }, [debouncedTextSearch])
 
-
+  /**
+   * Action to task (update, remove, remove tasks check)
+   * @param task 
+   * @param typeActionTask 
+   */
   const onActionTask = (task: TaskType, typeActionTask: string) => {
     if (task.taskName === '') {
-      alert('Khong duoc nhap rong');
+      alert('Please enter task name!!!');
       return;
     }
 
-    if (findListByName(task.taskName).length > 0) {
-      alert('Ten task da ton tai');
+    if (findListByName(task.taskName).length > 0 && typeActionTask === ACTION_TASK_TYPE.CREATE) {
+      alert('Task name is exist!!! Enter another task name');
       return;
     }
 
-    if(task.dateTime < moment().format('YYYY-MM-DD')) {
-      alert('Due date phai sau ngay hien tai');
+    if (task.dateTime < moment().format('YYYY-MM-DD')) {
+      alert('Date do not accept days in the past as due date');
       return;
     }
 
-    let listTaskClone = _.cloneDeep(listTask)
-    if (typeActionTask === ACTION_TASK_TYPE.CREATE) {
-      listTaskClone.push(task);
-      setTextSearch('');
-      listTaskClone.sort(compareDate);
-      setListTaskDisplay(listTaskClone);
-      setListTask(listTaskClone);
-    } else { // mode Update task
-      let indexTask = listTask.findIndex(elm => elm.taskId === task.taskId);
-      if (indexTask >= 0) {
-        listTaskClone[indexTask] = task;
+    switch (typeActionTask) {
+
+      case ACTION_TASK_TYPE.CREATE: {
+        let listTaskClone = _.cloneDeep(listTask);
+        listTaskClone.push(task);
+        setTextSearch('');
+        listTaskClone.sort(compareDate);
         setListTaskDisplay(listTaskClone);
-        setListTask(listTaskClone);
+        updateDataListTask(listTaskClone);
+        break;
+      }
+
+      case ACTION_TASK_TYPE.UPDATE_DISPLAY: {
+        let listTaskClone = _.cloneDeep(listTaskDisplay);
+        let indexTask = listTaskDisplay.findIndex(elm => elm.taskId === task.taskId);
+        if (indexTask >= 0) {
+          listTaskClone[indexTask] = task;
+          setListTaskDisplay(listTaskClone);
+          updateDataListTask(listTaskClone);
+        }
+        break;
+      }
+
+      case ACTION_TASK_TYPE.REMOVE_DISPLAY: {
+        let listTaskClone = _.cloneDeep(listTaskDisplay);
+        let indexTask = listTaskDisplay.findIndex(elm => elm.taskId === task.taskId);
+        if (indexTask >= 0) {
+          listTaskClone.splice(indexTask, 1);
+          setListTaskDisplay(listTaskClone);
+          // check if remove all list Update => bulk action area will be hidden
+          const found = listTaskSelectUpdate.some(r => listTaskClone.findIndex(e => e.taskId === r.taskId) >= 0);
+          if (!found) {
+            setCheckEditTask(false);
+          }
+        }
+        break;
       }
     }
-
   }
+
+  /**
+   * Check task select remove tasks check
+   * @param taskId 
+   * @param typeCheck 
+   */
+  const clickCheckBoxTask = (taskId: string, typeCheck: any) => {
+    const listTaskUpdate = _.cloneDeep(listTaskSelectUpdate);
+
+    if (typeCheck) {
+      const taskUpdate = listTaskDisplay.find(e => e.taskId === taskId);
+      if (taskUpdate) {
+        listTaskUpdate.push(taskUpdate);
+        setListTaskSelectUpdate(listTaskUpdate);
+      }
+      setCheckEditTask(true);
+    } else {
+      let indexRemove = listTaskUpdate.findIndex(task => task.taskId === taskId);
+      listTaskUpdate.splice(indexRemove, 1);
+      setListTaskSelectUpdate(listTaskUpdate);
+      if (listTaskUpdate.length === 0) {
+        setCheckEditTask(false);
+      }
+    }
+  }
+
+  /**
+   * Get list Task checked (after remove other task)
+   * @param task 
+   */
+  const getIsChecked = (task: TaskType) => {
+    return listTaskSelectUpdate.findIndex(elmTask => elmTask.taskId === task.taskId) >= 0;
+  }
+
+  /**
+   * Remove all task checked
+   */
+  const removeAllTaskChecked = () => {
+    const listTaskAffterRemove = listTaskDisplay.filter((elem) => !listTaskSelectUpdate.find(({ taskId }) => elem.taskId === taskId));
+    setListTaskDisplay(listTaskAffterRemove);
+    updateDataListTask(listTaskAffterRemove);
+  }
+
+  const getClassNameScrollList = () => {
+    return checkEditTask ? 'list-task calc-210' : 'list-task calc-145';
+  }
+
   return (
     <>
       <div className="wrap-container">
@@ -79,21 +180,22 @@ export default function ManagerTask() {
           <div className="enter-name-task">
             <input className="mr-b20 wd-100" value={textSearch} onChange={envent => setTextSearch(envent.target.value)} placeholder="Search..." />
           </div>
-          <ul className="list-task">
+          <ul className={getClassNameScrollList()}>
             {listTaskDisplay.map(task => (
               <TaskItem
                 task={task}
                 actionTask={onActionTask}
-                setCheckEditTask={() => setCheckEditTask(!checkEditTask)}
+                setCheckEditTask={clickCheckBoxTask}
+                isCheck={getIsChecked(task)}
               />
             ))}
             {checkEditTask &&
-              <div className="bull-action">
-                <label>Due Date</label>
+              <div className="bulk-action">
+                <label>Bulk Action</label>
                 <div className="item-action">
                   <div className="item-action-button">
                     <button className="btn btn-action btn-blue w-120px h-35 mr-r10">Done</button>
-                    <button className="btn btn-action btn-red h-35 w-120px">Remove</button>
+                    <button className="btn btn-action btn-red h-35 w-120px" onClick={removeAllTaskChecked}>Remove</button>
                   </div>
                 </div>
               </div>}

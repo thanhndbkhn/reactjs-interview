@@ -206,6 +206,14 @@ table {
 
 .wrap-container .list-task {
   padding: 0 20px;
+  overflow-y: auto;
+}
+.calc-145 {
+  height: calc(100vh - 145px);
+}
+
+.calc-210 {
+height: calc(100vh - 210px);
 }
 
 .item-action-button button {
@@ -223,7 +231,7 @@ table {
 }
 
 .list-task .item .item-action,
-.wrap-container .bull-action{
+.wrap-container .bulk-action{
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -232,7 +240,7 @@ table {
   padding: 0 10px;
 }
 
-.wrap-container .bull-action {
+.wrap-container .bulk-action {
   position: absolute;
   left: 0;
   bottom: 0;

@@ -110,13 +110,27 @@ table {
   height: 35px;
 }
 
-.wrap-container {
-  position: relative;
-  margin: 0 auto;
-  width: 40%;
+#container {
   height: 100%;
+}
+
+.wrap-container {
+  display: flex;
+  margin: 0 auto;
+  height: 100%;
+  width: 80%;
   border: 1px solid;
   min-width: 430px;
+}
+
+.wrap-container .wrap-container-create-edit{
+  width: 45%;
+}
+
+.wrap-container .wrap-container-list{
+  width: 55%;
+  position: relative;
+  border-left: 1px solid;
 }
 
 .wrap-container label {
@@ -130,6 +144,32 @@ table {
   font-weight: bold;
   text-align: center;
 }
+
+.option-task .option-task-item {
+  width: 40%;
+}
+
+.option-piority {
+  width: 100%;
+  height: 30px;
+  padding-left: 2px;
+}
+
+.mySelect__value-container{
+  height: 30px;
+ }
+
+ .mySelect__control {
+   min-height: unset!important;
+ }
+
+ .mySelect__dropdown-indicator {
+   padding: 4px!important;
+ }
+
+ .mySelect__input {
+   display: none!important;
+ }
 
 .wrap-container .content-add-edit-task,
 .wrap-container .enter-name-task {
@@ -183,7 +223,7 @@ table {
 }
 
 .list-task .item .item-action,
-.wrap-container .bull-action{
+.wrap-container .bulk-action{
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -192,14 +232,16 @@ table {
   padding: 0 10px;
 }
 
-.wrap-container .bull-action {
+.wrap-container .bulk-action {
   position: absolute;
   left: 0;
   bottom: 0;
   width: 100%;
   border: 0;
+  background-color: #fff;
   border-top: 1px solid;
 }
+
 
 /* Create a custom checkbox */
 /* The container */

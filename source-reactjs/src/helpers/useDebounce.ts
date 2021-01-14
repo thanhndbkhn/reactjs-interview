@@ -1,4 +1,7 @@
 import { useState, useEffect } from 'react';
+/**
+ * custom hooks
+ */
 export default (value: string, timeout: number) => {
   const [state, setState] = useState(value);
   useEffect(() => {
