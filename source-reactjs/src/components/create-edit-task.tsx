@@ -13,19 +13,19 @@ export interface ICreateEditTaskProps {
 
 const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
   const [taskName, setTaskName] = useState('');
-  const [descriptionTask, setDescriptionTask] = useState('');
+  const [taskDescription, setTaskDescription] = useState('');
   const [dateTime, setDateTime] = useState('');
-  const [piorityTask, setPiorityTask] = useState(OPTION_PIORITY[1]);
+  const [taskPiority, setTaskPiority] = useState(OPTION_PIORITY[1]);
 
   useEffect(() => {
     if (_.isNil(props.task)) {
       setDateTime(moment().format('YYYY-MM-DD'));
-      setPiorityTask(OPTION_PIORITY[1]);// default is normal
+      setTaskPiority(OPTION_PIORITY[1]);// default is normal
     } else {
       setTaskName(props.task.taskName);
-      setDescriptionTask(props.task.descriptionTask);
+      setTaskDescription(props.task.taskDescription);
       setDateTime(props.task.dateTime);
-      setPiorityTask(props.task.piorityTask);
+      setTaskPiority(props.task.taskPiority);
     }
   }, [])
 
@@ -33,14 +33,14 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
    *  Action to task (update, remove, remove tasks check)
    */
   const actionTaskClick = () => {
-    if(props.actionTask) {
+    if (props.actionTask) {
       props.actionTask(
         {
           taskId: props.task ? props.task.taskId : uuidV4(),
           taskName,
-          descriptionTask,
+          taskDescription,
           dateTime,
-          piorityTask,
+          taskPiority,
         },
         props.typeActionTask);
     }
@@ -51,7 +51,7 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
    * @param selectedOption 
    */
   const changeSelectPiority = (selectedOption: any) => {
-    setPiorityTask(selectedOption);
+    setTaskPiority(selectedOption);
   }
 
   return (
@@ -63,9 +63,7 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
           onBlur={event => setTaskName(event.target.value)} />
         <div className="description mr-b20">
           <label>Description</label>
-          <textarea onBlur={(e) => setDescriptionTask(e.target.value)}>
-            {_.isNil(props.task) ? '' : props.task.descriptionTask}
-            </textarea>
+          <textarea defaultValue={_.isNil(props.task) ? '' : props.task.taskDescription} onBlur={(e) => setTaskDescription(e.target.value)} />
         </div>
         <div className="option-task mr-b20">
           <div className="option-task-item">
@@ -80,7 +78,7 @@ const CreateEditTask: React.FC<ICreateEditTaskProps> = (props) => {
               classNamePrefix="mySelect"
               onChange={changeSelectPiority}
               className="option-piority"
-              value={piorityTask}
+              value={taskPiority}
               label="Single select"
               options={OPTION_PIORITY} />
           </div>

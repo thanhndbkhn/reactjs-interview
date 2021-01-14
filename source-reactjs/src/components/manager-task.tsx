@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { ACTION_TASK_TYPE, TaskType } from '../const/constants';
+import { ACTION_TASK_TYPE, MESSAGE_VALIDATE, TaskType, TIME_DEBOUNCE, TYPE_SEARCH} from '../const/constants';
 import useDebounce from '../helpers/useDebounce';
 import CreateEditTask from './create-edit-task';
 import TaskItem from './task-item';
 import _ from 'lodash';
 import moment from 'moment';
 import { compareDate } from '../helpers/logic';
-// import 'react-notifications/lib/notifications.css';
-
 
 export default function ManagerTask() {
   /**
@@ -30,7 +28,7 @@ export default function ManagerTask() {
   const [listTaskSelectUpdate, setListTaskSelectUpdate] = useState<TaskType[]>([]);
   const [textSearch, setTextSearch] = useState('');
   const [checkEditTask, setCheckEditTask] = useState(false);
-  const debouncedTextSearch = useDebounce(textSearch, 500);
+  const debouncedTextSearch = useDebounce(textSearch, TIME_DEBOUNCE);
 
   /**
    * Update data into localstorage
@@ -45,13 +43,17 @@ export default function ManagerTask() {
    * Find list task have taskName includes textSearch input
    * @param text 
    */
-  const findListByName = (taskName: string) => {
-    return listTask.filter((elm: { taskName: string | string[]; }) => elm.taskName.includes(taskName));
+  const findListByName = (taskName: string, typeSearch: string) => {
+    if(typeSearch === TYPE_SEARCH.INCLUDES) {
+      return listTask.filter((elm: { taskName: string | string[]; }) => elm.taskName.includes(taskName));
+    } else {
+      return listTask.filter((elm: { taskName: string | string[]; }) => elm.taskName === taskName);
+    }
   }
 
   useEffect(() => {
     if (textSearch !== '' && listTask.length > 0) {
-      const listFilter = findListByName(textSearch);
+      const listFilter = findListByName(textSearch, TYPE_SEARCH.INCLUDES);
       setListTaskDisplay(listFilter);
     } else {
       setListTaskDisplay(listTask);
@@ -65,22 +67,21 @@ export default function ManagerTask() {
    */
   const onActionTask = (task: TaskType, typeActionTask: string) => {
     if (task.taskName === '') {
-      alert('Please enter task name!!!');
+      alert(MESSAGE_VALIDATE.TASK_NAME_IS_EMPTY);
       return;
     }
 
-    if (findListByName(task.taskName).length > 0 && typeActionTask === ACTION_TASK_TYPE.CREATE) {
-      alert('Task name is exist!!! Enter another task name');
+    if (findListByName(task.taskName, TYPE_SEARCH.EQUALS).length > 0 && typeActionTask === ACTION_TASK_TYPE.CREATE) {
+      alert(MESSAGE_VALIDATE.TASK_NAME_EXIST);
       return;
     }
 
     if (task.dateTime < moment().format('YYYY-MM-DD')) {
-      alert('Date do not accept days in the past as due date');
+      alert(MESSAGE_VALIDATE.DUE_DATE_PAST_DAY);
       return;
     }
 
     switch (typeActionTask) {
-
       case ACTION_TASK_TYPE.CREATE: {
         let listTaskClone = _.cloneDeep(listTask);
         listTaskClone.push(task);
@@ -181,8 +182,9 @@ export default function ManagerTask() {
             <input className="mr-b20 wd-100" value={textSearch} onChange={envent => setTextSearch(envent.target.value)} placeholder="Search..." />
           </div>
           <ul className={getClassNameScrollList()}>
-            {listTaskDisplay.map(task => (
+            {listTaskDisplay.map((task ,index) => (
               <TaskItem
+                key={index}
                 task={task}
                 actionTask={onActionTask}
                 setCheckEditTask={clickCheckBoxTask}
