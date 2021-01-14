@@ -14,6 +14,10 @@ export const MESSAGE_VALIDATE = {
   DUE_DATE_PAST_DAY: 'Date do not accept days in the past as due date'
 }
 
+export const MESSAGE_SUCCESS = {
+  UPDATE_SUCCESS: 'Update success!!!'
+}
+
 export const TYPE_SEARCH = {
   INCLUDES: 'includes',
   EQUALS: 'equals'

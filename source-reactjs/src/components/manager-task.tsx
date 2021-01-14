@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ACTION_TASK_TYPE, MESSAGE_VALIDATE, TaskType, TIME_DEBOUNCE, TYPE_SEARCH} from '../const/constants';
+import { ACTION_TASK_TYPE, MESSAGE_SUCCESS, MESSAGE_VALIDATE, TaskType, TIME_DEBOUNCE, TYPE_SEARCH} from '../const/constants';
 import useDebounce from '../helpers/useDebounce';
 import CreateEditTask from './create-edit-task';
 import TaskItem from './task-item';
@@ -76,6 +76,15 @@ export default function ManagerTask() {
       return;
     }
 
+    if(typeActionTask === ACTION_TASK_TYPE.UPDATE_DISPLAY) {
+      let taskUpdateInList = listTaskDisplay.find(elm => elm.taskId === task.taskId);
+      let taskSameName = findListByName(task.taskName, TYPE_SEARCH.EQUALS);
+      if(taskUpdateInList && !_.isNil(taskSameName[0]) && taskUpdateInList.taskName !== taskSameName[0].taskName) {
+        alert(MESSAGE_VALIDATE.TASK_NAME_EXIST);
+        return;
+      } 
+    }
+
     if (task.dateTime < moment().format('YYYY-MM-DD')) {
       alert(MESSAGE_VALIDATE.DUE_DATE_PAST_DAY);
       return;
@@ -99,6 +108,7 @@ export default function ManagerTask() {
           listTaskClone[indexTask] = task;
           setListTaskDisplay(listTaskClone);
           updateDataListTask(listTaskClone);
+          alert(MESSAGE_SUCCESS.UPDATE_SUCCESS);
         }
         break;
       }
