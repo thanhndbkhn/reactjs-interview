@@ -120,7 +120,7 @@ table {
   height: 100%;
   width: 80%;
   border: 1px solid;
-  min-width: 430px;
+  min-width: 630px;
 }
 
 .wrap-container .wrap-container-create-edit{
@@ -131,6 +131,7 @@ table {
   width: 55%;
   position: relative;
   border-left: 1px solid;
+  min-width: 430px;
 }
 
 .wrap-container label {
@@ -206,6 +207,14 @@ table {
 
 .wrap-container .list-task {
   padding: 0 20px;
+  overflow-y: auto;
+}
+.calc-145 {
+  height: calc(100vh - 145px);
+}
+
+.calc-210 {
+height: calc(100vh - 210px);
 }
 
 .item-action-button button {
